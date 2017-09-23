@@ -5,7 +5,9 @@ from marshmallow_autoschema import autoschema
 class DataStructure:
 
     def __init__(self, *,
-                 count: int) -> None: pass
+                 count: int,
+                 factor: int) -> None:
+        self.derived = self.count * self.factor
 
 
 def test_schema_name_is_valid():
@@ -14,3 +16,7 @@ def test_schema_name_is_valid():
 
 def test_model_is_constructor():
     assert DataStructure == DataStructure.__schema__.__model__
+
+
+def test_init_body_called_after_attributes_set():
+    assert 30 == DataStructure(count=5, factor=6).derived
