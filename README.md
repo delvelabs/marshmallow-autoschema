@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/delvelabs/marshmallow-autoschema.svg?branch=master)](https://travis-ci.org/delvelabs/marshmallow-autoschema)
+[![PyPi](https://badge.fury.io/py/marshmallow-autoschema.svg)](https://badge.fury.io/py/marshmallow-autoschema)
 
 # marshmallow-autoschema
 
