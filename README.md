@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/delvelabs/marshmallow-autoschema.svg?branch=master)](https://travis-ci.org/delvelabs/marshmallow-autoschema)
+
 # marshmallow-autoschema
 
 Generate marshmallow schemas from code annotations and type hinting, converting
