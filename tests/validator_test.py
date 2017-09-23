@@ -20,21 +20,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .schema_factory import schema_metafactory, One, Many, Raw
-from .schema_factory import validate_field
-from .utilities import FactorySchema, sc_to_cc
-from .__version__ import __version__
+from pytest import raises
+
+from marshmallow_autoschema import autoschema, One, Many, validate_field
+from marshmallow.validate import Range, URL as ValURL, Length
+from marshmallow.exceptions import ValidationError
 
 
-autoschema = schema_metafactory()
-autoschema_camelcase = schema_metafactory(field_namer=sc_to_cc)
+@validate_field('popularity', Range(1, 10))
+@validate_field('links', ValURL())
+@autoschema
+class MyPageRank:
+    '''
+    Eat your heart out, Eric Schmidt.
+    '''
 
-__all__ = [
-    __version__,
-    validate_field,
-    schema_metafactory,
-    autoschema,
-    One,
-    Many,
-    Raw,
-]
+    def __init__(self, *, popularity: int, links: List[str]):
+        pass
+
+
+def test_load_validation():
+    record = MyPageRank(popularity=5, links=['http://www.foo.com']).dump()
+    tampered_record = {'popularity': 1, 'links': ['1337']}
+    with raises(ValidationError):
+        MyPageRank.load(tampered_record)
