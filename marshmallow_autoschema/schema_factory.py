@@ -25,7 +25,8 @@ from functools import partial, namedtuple
 from inspect import signature, Parameter
 from typing import Generic, TypeVar, List
 
-from marshmallow import Schema, fields, missing
+from marshmallow import fields, missing
+from .utilities import FactorySchema
 
 
 class Raw:
@@ -89,7 +90,7 @@ st_fieldspec = namedtuple(
 def schema_metafactory(  # noqa
         *,
         field_namer=lambda x: x,
-        schema_base_class=Schema,
+        schema_base_class=FactorySchema,
         extended_field_map=None):
     '''
     Creates a domain-specific schema factory.

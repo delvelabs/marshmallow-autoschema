@@ -21,12 +21,12 @@
 # SOFTWARE.
 
 from .schema_factory import schema_metafactory, One, Many, Raw
-from .utilities import FactorySchema, sc_to_cc
+from .utilities import sc_to_cc
 from .__version__ import __version__
 
 
-autoschema = schema_metafactory(schema_base_class=FactorySchema)
-autoschema_camelcase = schema_metafactory(schema_base_class=FactorySchema, field_namer=sc_to_cc)
+autoschema = schema_metafactory()
+autoschema_camelcase = schema_metafactory(field_namer=sc_to_cc)
 
 __all__ = [
     __version__,

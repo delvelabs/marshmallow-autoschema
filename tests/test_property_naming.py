@@ -20,35 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from unittest import TestCase
-from marshmallow_autoschema import autoschema_camelcase
+from marshmallow_autoschema import autoschema_camelcase, schema_metafactory
 
 
-class PropertyNamingTest(TestCase):
+def test_serialization_to_camel_case():
+    obj = MyObject(my_integer=1, my_simple_string="test", special_case="special")
+    data, errors = obj.dump()
 
-    def test_serialization_to_camel_case(self):
-        obj = MyObject(my_integer=1, my_simple_string="test", special_case="special")
-        data, errors = obj.dump()
+    assert data == {
+        "myInteger": 1,
+        "mySimpleString": "test",
+        "_specialCASE": "special",
+    }
 
-        self.assertEqual(data, {
-            "myInteger": 1,
-            "mySimpleString": "test",
-            "_specialCASE": "special",
-        })
 
-    def test_load_from_camelcase(self):
-        obj = MyObject(my_integer=1, my_simple_string="test", special_case="special")
-        data, errors = obj.dump()
+def test_load_from_camelcase():
+    obj = MyObject(my_integer=1, my_simple_string="test", special_case="special")
+    data, errors = obj.dump()
 
-        obj, errors = MyObject.load({
-            "myInteger": 1,
-            "mySimpleString": "test",
-            "_specialCASE": "special",
-        })
+    obj, errors = MyObject.load({
+        "myInteger": 1,
+        "mySimpleString": "test",
+        "_specialCASE": "special",
+    })
 
-        self.assertEqual(obj.my_integer, 1)
-        self.assertEqual(obj.my_simple_string, "test")
-        self.assertEqual(obj.special_case, "special")
+    assert obj.my_integer == 1
+    assert obj.my_simple_string == "test"
+    assert obj.special_case == "special"
+
+
+def test_custom_naming():
+    @schema_metafactory(field_namer=lambda x: x.upper())
+    class Custom:
+        def __init__(self, *,
+                     hello: int,
+                     world: int) -> None: pass
+
+    assert {"HELLO": 1, "WORLD": 2} == Custom(hello=1, world=2).dump().data
 
 
 @autoschema_camelcase
