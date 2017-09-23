@@ -20,19 +20,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .schema_factory import schema_metafactory, One, Many, Raw
-from .utilities import FactorySchema, sc_to_cc
-from .__version__ import __version__
+import re
+from marshmallow import Schema, post_load
 
 
-autoschema = schema_metafactory(schema_base_class=FactorySchema)
-autoschema_camelcase = schema_metafactory(schema_base_class=FactorySchema, field_namer=sc_to_cc)
+def sc_to_cc(s):
+    return re.sub('_([a-z])', lambda m: m.group(1).upper(), s)
 
-__all__ = [
-    __version__,
-    schema_metafactory,
-    autoschema,
-    One,
-    Many,
-    Raw,
-]
+
+class FactorySchema(Schema):
+    """
+    Schema extension to generate the model objects on load.
+    """
+
+    @post_load
+    def make(self, data):
+        return self.__model__(**data)
