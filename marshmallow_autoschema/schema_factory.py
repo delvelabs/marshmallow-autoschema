@@ -257,12 +257,12 @@ def schema_metafactory(  # noqa
 
         def model_dump(self, *args, **kwargs):
             strict = kwargs.pop('strict', True)
-            schema_ins = self.__schema__(*args, strict=strict, **kwargs)
+            schema_ins = getattr(self, SCHEMA_ATTRNAME)(*args, strict=strict, **kwargs)
             return schema_ins.dump(self)
 
         def model_load(cls, data, *args, **kwargs):
             strict = kwargs.pop('strict', True)
-            schema_ins = cls.__schema__(*args, strict=strict, **kwargs)
+            schema_ins = getattr(cls, SCHEMA_ATTRNAME)(*args, strict=strict, **kwargs)
             return schema_ins.load(data)
 
         model_cls.dump = model_dump
