@@ -33,6 +33,8 @@ __all__ = [
     __version__,
     validate_field,
     schema_metafactory,
+    FactorySchema,
+    sc_to_cc,
     autoschema,
     One,
     Many,

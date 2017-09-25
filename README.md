@@ -8,9 +8,11 @@ object structures to serializable native types and back effortlessly.
 
 
 ```python
-from marshmallow_autoschema import autoschema, Many, One
+from marshmallow_autoschema import autoschema, validate_field, Many, One
+from marshmallow.validate import Range
 
 
+@validate_field('word_count', Range(0, 10000))
 @autoschema
 class Page:
 
