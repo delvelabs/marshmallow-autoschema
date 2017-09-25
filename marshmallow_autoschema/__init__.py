@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 from .schema_factory import schema_metafactory, One, Many, Raw
-from .utilities import sc_to_cc
+from .schema_factory import validate_field
+from .utilities import FactorySchema, sc_to_cc
 from .__version__ import __version__
 
 
@@ -30,6 +31,7 @@ autoschema_camelcase = schema_metafactory(field_namer=sc_to_cc)
 
 __all__ = [
     __version__,
+    validate_field,
     schema_metafactory,
     autoschema,
     One,
