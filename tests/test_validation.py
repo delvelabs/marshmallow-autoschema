@@ -27,7 +27,7 @@ from marshmallow_autoschema import schema_metafactory
 from marshmallow_autoschema import autoschema, One, Many, validate_field
 
 from marshmallow.fields import Url
-from marshmallow.validate import Range, URL as ValURL, Length
+from marshmallow.validate import Range, URL as ValURL
 from marshmallow.exceptions import ValidationError
 
 
@@ -73,7 +73,7 @@ class MyPageRank:
 
 
 def test_load_validation():
-    record = MyPageRank(popularity=5, links=['http://www.foo.com']).dump()
+    MyPageRank(popularity=5, links=['http://www.foo.com']).dump()
     tampered_record = {'popularity': 1, 'links': ['1337']}
     with raises(ValidationError):
         MyPageRank.load(tampered_record)
