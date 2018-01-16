@@ -91,6 +91,22 @@ def test_default_list_is_distinct_per_instance():
     assert a.list_objects is not b.list_objects
 
 
+def test_with_type_inherit():
+
+    obj = MySubObject(my_integer=1,
+                      my_other_integer=2,
+                      my_string="hello",
+                      my_boolean=True)
+
+    out, errors = obj.dump()
+    assert out == {
+        "my_integer": 1,
+        "my_other_integer": 2,
+        "my_string": "hello",
+        "my_boolean": True,
+    }
+
+
 @autoschema
 class MyObject:
 
@@ -105,3 +121,10 @@ class MyContainer:
     def __init__(self, *,
                  single_object: One[MyObject],
                  list_objects: Many[MyObject]=None) -> None: pass
+
+
+@autoschema
+class MySubObject(MyObject):
+
+    def __init__(self, *,
+                 my_other_integer: int=0) -> None: pass
