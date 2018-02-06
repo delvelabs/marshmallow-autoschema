@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from enum import Enum
+from datetime import datetime, timezone
 
 from marshmallow_autoschema import autoschema, One, Many
 
@@ -26,6 +28,8 @@ from marshmallow_autoschema import autoschema, One, Many
 def test_dump_native_types():
     obj = MyObject(my_integer=1,
                    my_string="hello",
+                   my_datetime=datetime(1918, 11, 11),
+                   my_enum=MyEnum.Green,
                    my_boolean=True)
 
     out, errors = obj.dump()
@@ -33,6 +37,8 @@ def test_dump_native_types():
         "my_integer": 1,
         "my_string": "hello",
         "my_boolean": True,
+        "my_enum": "Green",
+        "my_datetime": "1918-11-11T00:00:00+00:00",
     }
 
 
@@ -48,32 +54,57 @@ def test_load_native_types():
     assert obj.my_boolean is False
 
 
+# noinspection PyTypeChecker
 def test_dump_with_relations():
-    obj = MyContainer(single_object=MyObject(my_integer=1),
-                      list_objects=[MyObject(my_integer=2),
-                                    MyObject(my_integer=3)])
+    obj = MyContainer(
+        single_object=MyObject(my_integer=1),
+        list_objects=[
+            MyObject(my_integer=2, my_enum=MyEnum.Magenta),
+            MyObject(my_integer=3, my_boolean=True,
+                     my_datetime=datetime(1666, 6, 6))],
+        list_enums=[MyEnum.Blue]
+    )
+
     out, errors = obj.dump()
     assert out == {
-        "single_object": {"my_integer": 1, "my_string": "", "my_boolean": False},
+        "single_object": {
+            "my_integer": 1,
+            "my_string": "",
+            "my_boolean": False,
+            "my_datetime": None,
+            "my_enum": "Red"},
         "list_objects": [
-            {"my_integer": 2, "my_string": "", "my_boolean": False},
-            {"my_integer": 3, "my_string": "", "my_boolean": False},
+            {"my_integer": 2, "my_string": "", "my_boolean": False,
+             "my_enum": "Magenta", "my_datetime": None},
+            {"my_integer": 3, "my_string": "", "my_boolean": True,
+             "my_enum": "Red", "my_datetime": "1666-06-06T00:00:00+00:00"},
         ],
+        "list_enums": ["Blue"]
     }
 
 
 def test_load_with_relations():
     out, errors = MyContainer.load({
-        "single_object": {"my_integer": 1, "my_string": "", "my_boolean": False},
+        "single_object": {
+            "my_integer": 1,
+            "my_string": "",
+            "my_boolean": False},
         "list_objects": [
-            {"my_integer": 2, "my_string": "", "my_boolean": False},
-            {"my_integer": 3, "my_string": "", "my_boolean": False},
+            {"my_integer": 2, "my_string": "", "my_boolean": False,
+             "my_enum": "Magenta"},
+            {"my_integer": 3, "my_string": "", "my_boolean": True,
+             "my_datetime": "1666-06-06T12:33:33+00:00"},
         ],
+        "list_enums": ["Red", "Green"]
     })
 
+    assert out.list_enums == [MyEnum.Red, MyEnum.Green]
     assert out.single_object.my_integer == 1
     assert out.list_objects[0].my_integer == 2
     assert out.list_objects[1].my_integer == 3
+    assert out.list_objects[0].my_enum == MyEnum.Magenta
+    assert out.list_objects[1].my_datetime == datetime(1666, 6, 6, 12, 33,
+                                                       33, tzinfo=timezone.utc)
 
 
 def test_default_object_from_constructor():
@@ -82,19 +113,23 @@ def test_default_object_from_constructor():
     assert data == {
         "single_object": None,
         "list_objects": [],
+        "list_enums": [],
     }
 
 
+# noinspection PyTypeChecker
 def test_default_list_is_distinct_per_instance():
     a = MyContainer(single_object=None)
     b = MyContainer(single_object=None)
     assert a.list_objects is not b.list_objects
 
 
+# noinspection PyArgumentList
 def test_with_type_inherit():
-
     obj = MySubObject(my_integer=1,
                       my_other_integer=2,
+                      my_enum=MyEnum.Blue,
+                      my_datetime=datetime(2000, 12, 12),
                       my_string="hello",
                       my_boolean=True)
 
@@ -103,28 +138,40 @@ def test_with_type_inherit():
         "my_integer": 1,
         "my_other_integer": 2,
         "my_string": "hello",
+        "my_datetime": "2000-12-12T00:00:00+00:00",
+        "my_enum": 'Blue',
         "my_boolean": True,
     }
+
+
+class MyEnum(Enum):
+    Red = '#ff0000'
+    Green = '#00ff00'
+    Blue = '#0000ff'
+    Magenta = '#ff00ff'
 
 
 @autoschema
 class MyObject:
 
     def __init__(self, *,
-                 my_integer: int=0,
-                 my_string: str="",
-                 my_boolean: bool=False) -> None: pass
+                 my_integer: int = 0,
+                 my_string: str = "",
+                 my_boolean: bool = False,
+                 my_datetime: datetime = None,
+                 my_enum: MyEnum = MyEnum.Red) -> None: pass
 
 
 @autoschema
 class MyContainer:
     def __init__(self, *,
                  single_object: One[MyObject],
-                 list_objects: Many[MyObject]=None) -> None: pass
+                 list_objects: Many[MyObject] = None,
+                 list_enums: Many[MyEnum] = None) -> None: pass
 
 
 @autoschema
 class MySubObject(MyObject):
 
     def __init__(self, *,
-                 my_other_integer: int=0) -> None: pass
+                 my_other_integer: int = 0) -> None: pass
