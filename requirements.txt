@@ -1,3 +1,2 @@
-marshmallow>=2.0.0
+marshmallow==2.15.0
 marshmallow_enum>=1.4.1
-pytest>=3.4.0

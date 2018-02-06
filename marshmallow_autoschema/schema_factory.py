@@ -38,11 +38,6 @@ class Raw:
     pass
 
 
-def print_now(x):
-    sys.stdout.write(str(x) + '\n')
-    sys.stdout.flush()
-
-
 T = TypeVar('T')
 SCHEMA_ATTRNAME = '__schema__'
 MODEL_ATTRNAME = '__model__'
@@ -297,7 +292,6 @@ class schema_metafactory:
         schema_attrs = {}
 
         # generate field objects from fieldspecs
-        print('')
         for kwname, fspec in init_named_kwargs.items():
             load_dump_to = getattr(
                 model_cls, 'irregular_names', {}

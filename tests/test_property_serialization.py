@@ -19,10 +19,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from enum import Enum
 from datetime import datetime, timezone
+from enum import Enum
 
-from marshmallow_autoschema import autoschema, One, Many
+from marshmallow_autoschema import Many, One, autoschema
 
 
 def test_dump_native_types():
@@ -93,7 +93,7 @@ def test_load_with_relations():
             {"my_integer": 2, "my_string": "", "my_boolean": False,
              "my_enum": "Magenta"},
             {"my_integer": 3, "my_string": "", "my_boolean": True,
-             "my_datetime": "1666-06-06T12:33:33+00:00"},
+             "my_datetime": "1666-06-06T00:00:00+00:00"},
         ],
         "list_enums": ["Red", "Green"]
     })
@@ -103,8 +103,7 @@ def test_load_with_relations():
     assert out.list_objects[0].my_integer == 2
     assert out.list_objects[1].my_integer == 3
     assert out.list_objects[0].my_enum == MyEnum.Magenta
-    assert out.list_objects[1].my_datetime == datetime(1666, 6, 6, 12, 33,
-                                                       33, tzinfo=timezone.utc)
+    assert out.list_objects[1].my_datetime == datetime(1666, 6, 6)
 
 
 def test_default_object_from_constructor():
@@ -153,7 +152,6 @@ class MyEnum(Enum):
 
 @autoschema
 class MyObject:
-
     def __init__(self, *,
                  my_integer: int = 0,
                  my_string: str = "",
@@ -174,4 +172,5 @@ class MyContainer:
 class MySubObject(MyObject):
 
     def __init__(self, *,
-                 my_other_integer: int = 0) -> None: pass
+                 my_other_integer: int = 0) -> None:
+        pass
