@@ -26,7 +26,8 @@ def dep_list(filename):
 
 setup(name='marshmallow-autoschema',
       version=version_data['__version__'],
-      description='Generate marshmallow schemas from type annotations and decorators.',
+      description='Generate marshmallow schemas from type annotations and '
+                  'decorators.',
       author='Delve Labs inc.',
       author_email='info@delvelabs.ca',
       url='https://github.com/delvelabs/marshmallow-autoschema',
