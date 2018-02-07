@@ -20,10 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import sys
 from datetime import datetime
 from enum import Enum
-from functools import namedtuple, partial
+from collections import namedtuple
+from functools import partial
 from inspect import Parameter, signature
 from typing import Callable, Generic, List, Optional, TypeVar, Union
 
@@ -88,7 +88,7 @@ def get_schema_cls(model_cls: type) -> type:
     '''
     sn = get_schema_cls_name(model_cls)
     try:
-        return getattr(model_cls, SCHEMA_ATTRNAME)
+        return getattr(model_cls, SCHEMA_ATTRNAME)  # type: ignore
     except AttributeError:
         raise ValueError(
             '''{} does not appear to be a valid model, as it '
@@ -114,10 +114,7 @@ def check_type(typ: type, *typs: type) -> bool:
     Returns:
         True if `typ` matches any type in `typs`.
     '''
-    try:
-        return any([typ.__name__ == t.__name__ for t in typs])
-    except AttributeError:
-        return False
+    return any(typ.__name__ == t.__name__ for t in typs)
 
 
 Fieldspec = namedtuple(
@@ -273,7 +270,7 @@ class schema_metafactory:
 
         '''
 
-        base_init = model_cls.__init__
+        base_init = model_cls.__init__  # type: ignore
 
         # parse init to construct st_fieldspecs
         init_named_kwargs = {
