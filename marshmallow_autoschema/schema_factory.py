@@ -114,7 +114,12 @@ def check_type(typ: type, *typs: type) -> bool:
     Returns:
         True if `typ` matches any type in `typs`.
     '''
-    return any(typ.__name__ == t.__name__ for t in typs)
+    def get_type(t):
+        # Ptyhon 3.7 no longer has the __name__ property as typing.List is no longer a class.
+        # https://bugs.python.org/issue34422
+        return getattr(t, "__name__") or t._name
+
+    return any(get_type(typ) == get_type(t) for t in typs)
 
 
 Fieldspec = namedtuple(
