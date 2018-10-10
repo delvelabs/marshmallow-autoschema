@@ -117,7 +117,10 @@ def check_type(typ: type, *typs: type) -> bool:
     def get_type(t):
         # Ptyhon 3.7 no longer has the __name__ property as typing.List is no longer a class.
         # https://bugs.python.org/issue34422
-        return getattr(t, "__name__") or t._name
+        try:
+            return t.__name__
+        except AttributeError:
+            return t._name
 
     return any(get_type(typ) == get_type(t) for t in typs)
 
