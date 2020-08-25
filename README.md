@@ -36,12 +36,12 @@ data = {
     ],
 }
 
-book, errors = Book.load(data)
+book = Book.load(data)
 
 assert isinstance(book, Book)
 assert isinstance(book.cover, Page)
 
-out, errors = book.dump()
+out = book.dump()
 
 assert data == out
 ```
