@@ -204,12 +204,11 @@ class schema_metafactory:
     def get_field_from_annotation(
             self,
             fspec: Fieldspec,
-            load_dump_to: Optional[str] = None) -> fields.Field:
+            data_key: Optional[str] = None) -> fields.Field:
         '''
         Args:
-            load_dump_to:
-                If not none, the load_from and dump_to parameters of the field.
-                will be set to this value.
+            data_key:
+                If not none, the data_key parameter of the field will be set to this value.
             fspec:
 
         Returns:
@@ -245,8 +244,7 @@ class schema_metafactory:
             default=(fspec.default or missing),
             many=check_type(fspec.annotation, Many, List),
             required=fspec.required,
-            load_from=load_dump_to,
-            dump_to=load_dump_to,
+            data_key=data_key,
             allow_none=fspec.allow_none,
         )
 
@@ -295,12 +293,12 @@ class schema_metafactory:
 
         # generate field objects from fieldspecs
         for kwname, fspec in init_named_kwargs.items():
-            load_dump_to = getattr(
+            data_key = getattr(
                 model_cls, 'irregular_names', {}
             ).get(kwname, self.field_namer(kwname))
 
             schema_attrs[kwname] = self.get_field_from_annotation(
-                fspec, load_dump_to=load_dump_to,
+                fspec, data_key=data_key,
             )
 
         # construct the dependent Schema class
@@ -359,15 +357,18 @@ class schema_metafactory:
             base_init(model_self, **kwsift(kwargs, base_init))
 
         def model_dump(model_self, *args, **kwargs):
-            strict = kwargs.pop('strict', True)
-            schema_instance = getattr(model_self, SCHEMA_ATTRNAME)(
-                *args, strict=strict, **kwargs)
+            if 'strict' in kwargs:
+                raise Exception("Since marshmallow 3.0, schemas are always strict")
+
+            schema_instance = getattr(model_self, SCHEMA_ATTRNAME)(*args, **kwargs)
             return schema_instance.dump(model_self)
 
         def model_load(cls, data, *args, **kwargs):
-            strict = kwargs.pop('strict', True)
+            if 'strict' in kwargs:
+                raise Exception("Since marshmallow 3.0, schemas are always strict")
+
             schema_instance = getattr(cls, SCHEMA_ATTRNAME)(
-                *args, strict=strict, **kwargs)
+                *args, **kwargs)
             return schema_instance.load(data)
 
         model_cls.dump = model_dump
@@ -403,7 +404,7 @@ def validate_field(attr, validator, validate_child=True):
         schema_cls = getattr(model_cls, SCHEMA_ATTRNAME)
         field = schema_cls._declared_fields[attr]
         if isinstance(field, FieldList) and validate_child:
-            field.container.validators.append(validator)
+            field.inner.validators.append(validator)
         else:
             field.validators.append(validator)
 

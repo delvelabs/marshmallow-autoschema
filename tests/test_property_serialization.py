@@ -32,18 +32,18 @@ def test_dump_native_types():
                    my_enum=MyEnum.Green,
                    my_boolean=True)
 
-    out, errors = obj.dump()
+    out = obj.dump()
     assert out == {
         "my_integer": 1,
         "my_string": "hello",
         "my_boolean": True,
         "my_enum": "Green",
-        "my_datetime": "1918-11-11T00:00:00+00:00",
+        "my_datetime": "1918-11-11T00:00:00",
     }
 
 
 def test_load_native_types():
-    obj, errors = MyObject.load({
+    obj = MyObject.load({
         "my_integer": 2,
         "my_string": "world",
         "my_boolean": False,
@@ -65,7 +65,7 @@ def test_dump_with_relations():
         list_enums=[MyEnum.Blue]
     )
 
-    out, errors = obj.dump()
+    out = obj.dump()
     assert out == {
         "single_object": {
             "my_integer": 1,
@@ -77,14 +77,14 @@ def test_dump_with_relations():
             {"my_integer": 2, "my_string": "", "my_boolean": False,
              "my_enum": "Magenta", "my_datetime": None},
             {"my_integer": 3, "my_string": "", "my_boolean": True,
-             "my_enum": "Red", "my_datetime": "1666-06-06T00:00:00+00:00"},
+             "my_enum": "Red", "my_datetime": "1666-06-06T00:00:00"},
         ],
         "list_enums": ["Blue"]
     }
 
 
 def test_load_with_relations():
-    out, errors = MyContainer.load({
+    out = MyContainer.load({
         "single_object": {
             "my_integer": 1,
             "my_string": "",
@@ -93,7 +93,7 @@ def test_load_with_relations():
             {"my_integer": 2, "my_string": "", "my_boolean": False,
              "my_enum": "Magenta"},
             {"my_integer": 3, "my_string": "", "my_boolean": True,
-             "my_datetime": "1666-06-06T00:00:00+00:00"},
+             "my_datetime": "1666-06-06T00:00:00"},
         ],
         "list_enums": ["Red", "Green"]
     })
@@ -108,7 +108,7 @@ def test_load_with_relations():
 
 def test_default_object_from_constructor():
     obj = MyContainer(single_object=None)
-    data, errors = obj.dump()
+    data = obj.dump()
     assert data == {
         "single_object": None,
         "list_objects": [],
@@ -132,12 +132,12 @@ def test_with_type_inherit():
                       my_string="hello",
                       my_boolean=True)
 
-    out, errors = obj.dump()
+    out = obj.dump()
     assert out == {
         "my_integer": 1,
         "my_other_integer": 2,
         "my_string": "hello",
-        "my_datetime": "2000-12-12T00:00:00+00:00",
+        "my_datetime": "2000-12-12T00:00:00",
         "my_enum": 'Blue',
         "my_boolean": True,
     }

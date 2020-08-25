@@ -25,7 +25,7 @@ from marshmallow_autoschema import autoschema_camelcase, schema_metafactory
 
 def test_serialization_to_camel_case():
     obj = MyObject(my_integer=1, my_simple_string="test", special_case="special")
-    data, errors = obj.dump()
+    data = obj.dump()
 
     assert data == {
         "myInteger": 1,
@@ -36,9 +36,9 @@ def test_serialization_to_camel_case():
 
 def test_load_from_camelcase():
     obj = MyObject(my_integer=1, my_simple_string="test", special_case="special")
-    data, errors = obj.dump()
+    data = obj.dump()
 
-    obj, errors = MyObject.load({
+    obj = MyObject.load({
         "myInteger": 1,
         "mySimpleString": "test",
         "_specialCASE": "special",
@@ -56,7 +56,7 @@ def test_custom_naming():
                      hello: int,
                      world: int) -> None: pass
 
-    assert {"HELLO": 1, "WORLD": 2} == Custom(hello=1, world=2).dump().data
+    assert {"HELLO": 1, "WORLD": 2} == Custom(hello=1, world=2).dump()
 
 
 @autoschema_camelcase
