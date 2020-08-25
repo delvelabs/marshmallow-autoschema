@@ -49,15 +49,17 @@ class A:
 def test_custom_field():
     a = A(target="http://example.com/")
 
-    data, errors = a.dump()
+    data = a.dump()
     assert data == {"target": "http://example.com/"}
 
 
 def test_custom_field_fails_validation():
     a = A(target="example.com/")
 
-    data, errors = a.dump(strict=False)
-    assert errors == {"target": ["Not a valid URL."]}
+    with raises(ValidationError) as e:
+        a.load(a.dump())
+
+    assert e.value.args[0] == {"target": ["Not a valid URL."]}
 
 
 @validate_field('popularity', Range(1, 10))
