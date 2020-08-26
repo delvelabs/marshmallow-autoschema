@@ -79,3 +79,14 @@ def test_load_validation():
     tampered_record = {'popularity': 1, 'links': ['1337']}
     with raises(ValidationError):
         MyPageRank.load(tampered_record)
+
+
+@autoschema
+class Foo:
+    def __init__(self, *, bar: str):
+        self._bar = bar
+
+
+def test_unknown_keys_are_silently_dropped():
+    data = {"bar": "value", "more": 1}
+    Foo.load(data)

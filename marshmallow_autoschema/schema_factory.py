@@ -27,7 +27,7 @@ from functools import partial
 from inspect import Parameter, signature
 from typing import Callable, Generic, List, Optional, TypeVar, Union
 
-from marshmallow import fields, missing
+from marshmallow import fields, missing, EXCLUDE
 from marshmallow.fields import List as FieldList
 from marshmallow_enum import EnumField
 
@@ -309,6 +309,7 @@ class schema_metafactory:
             if SCHEMA_ATTRNAME in model_base.__dict__
         ) + (self.schema_base_class,)
 
+        schema_attrs['Meta'] = type('Meta', (object, ), {'unknown': EXCLUDE})
         schema_cls = type(
             get_schema_cls_name(model_cls), schema_bases, schema_attrs,
         )
